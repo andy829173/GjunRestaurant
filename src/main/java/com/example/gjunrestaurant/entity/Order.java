@@ -7,7 +7,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 @Entity
-@Table(name = "order")
+@Table(name = "`order`")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -24,4 +24,12 @@ public class Order {
     Integer totalPrice;
     @Column(name = "paid")
     Boolean paid;
+
+    public Order(String date, String time, Integer totalPrice) {
+        this.ID = ID;
+        this.date = date;
+        this.time = time;
+        this.totalPrice = totalPrice;
+        this.paid = false;
+    }
 }
