@@ -20,29 +20,25 @@ public class OrderService {
     }
 
     public Order toPay(Integer id) {
-        try {
-            Order order = findById(id);
-            order.setPaid(true);
-            return orderDao.save(order);
-        } catch (Exception e) {
-            return null;
-        }
+        Order dbOrder = findById(id);
+        dbOrder.setPaid(true);
+        return orderDao.save(dbOrder);
     }
 
     public String deleteOrder(Integer id) {
-        Order order = findById(id);
-        orderDao.delete(order);
-        return order + " is deleted!";
+        Order dbOrder = findById(id);
+        orderDao.delete(dbOrder);
+        return dbOrder + " is deleted!";
     }
 
     public Order updatePrice(Integer id, Integer totalPrice) {
-        Order order = findById(id);
-        order.setTotalPrice(totalPrice);
-        return orderDao.save(order);
+        Order dbOrder = findById(id);
+        dbOrder.setTotalPrice(totalPrice);
+        return orderDao.save(dbOrder);
     }
 
     public Order findById(Integer id) {
-        Order order = orderDao.findById(id).get();
-        return order;
+        Order dbOrder = orderDao.findById(id).get();
+        return dbOrder;
     }
 }
