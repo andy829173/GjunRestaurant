@@ -16,43 +16,58 @@ public class OrderItemService {
         return orderItemDao.save(orderItem);
     }
 
-    public List<OrderItem> readOrderItem(Integer orderID) {
+    public List<OrderItem> readOrderItemList(Integer orderID) {
         List<OrderItem> orderItemList = orderItemDao.queryByOrderID(orderID);
         return orderItemList;
     }
 
     public String updateOrderItem(Integer orderID, List<OrderItem> orderItemList) {
-        List<OrderItem> pastOrderItemList = readOrderItem(orderID);
+        List<OrderItem> pastOrderItemList = readOrderItemList(orderID);
         String msg = null;
         for (int i = 0; i <= pastOrderItemList.size(); i++) {
+            Integer quantity = orderItemList.get(i).getQuantity();
+            Integer newProductID = orderItemList.get(i).getProductID();
+            Integer pastProductID = pastOrderItemList.get(i).getProductID();
 
-            // 若修改 productID 不相符跳過
-            if (pastOrderItemList.get(i).getProductID() != orderItemList.get(i).getProductID()) {
-                continue;
-            }
-            // 若修改 productID 相符
-            if (pastOrderItemList.get(i).getProductID() == orderItemList.get(i).getProductID()) {
-                Integer quantity = orderItemList.get(i).getQuantity();
-                if (quantity < 0) {
-                    msg = "Failed! The quantity cannot less than 0.";
-                } else if (quantity == 0) {
-                    orderItemDao.delete(pastOrderItemList.get(i));
-                    msg = pastOrderItemList.get(i) + " has be Deleted!!";
-                } else {
+            // 數量為0則刪除
+            if (quantity == 0) {
+                msg += orderItemDao.deleteByProductID(pastProductID);
+                // 數量小於0則錯誤
+            } else if (quantity < 0) {
+                msg += "ProductID: " + newProductID + " Failed! The quantity cannot less than 0.\n";
+            } else {
+                // 若 productID 相符則修改數量
+                if (pastProductID == newProductID) {
                     pastOrderItemList.get(i).setQuantity(orderItemList.get(i).getQuantity());
                     orderItemDao.save(pastOrderItemList.get(i));
-                    msg = pastOrderItemList.get(i) + "has been updated.";
+                    msg += "ProductID: " + pastProductID + " has be updated.\n";
+                    // 若productID 不相符則新增品項
+                } else {
+                    OrderItem newItem = new OrderItem();
+                    newItem.setOrderID(orderID);
+                    newItem.setProductID(newProductID);
+                    newItem.setQuantity(orderItemList.get(i).getQuantity());
+                    OrderItemService orderItemService = new OrderItemService();
+                    orderItemService.createOrderItem(newItem);
+                    msg += "ProductID: " + newProductID + " has be created!\n";
                 }
             }
         }
         return msg;
     }
 
-    public String deleteOrderItem(Integer orderID) {
+    // 刪除全部OrderItem(by orderID)
+    public String deleteOrderItemList(Integer orderID) {
         List<OrderItem> orderItemList = orderItemDao.queryByOrderID(orderID);
         for (OrderItem orderItem : orderItemList) {
             orderItemDao.delete(orderItem);
         }
-        return "Order Detail has been deleted!!";
+        return "Order Detail has be deleted!!";
+    }
+
+    // 刪除一筆OrderItem
+    public String deleteOrderItem(Integer productID) {
+        OrderItem orderItem = orderItemDao.deleteByProductID(productID);
+        return "ProductID: " + productID + " has be deleted!\n";
     }
 }
