@@ -47,6 +47,11 @@ public class OrderItemService {
         return newOrder.getID() + "has be created";
     }
 
+    public List<Order> readOrderList() {
+        List<Order> orderList = orderDao.queryFindAll();
+        return orderList;
+    }
+
     public List<OrderItem> readOrderItemList(String orderID) {
         List<OrderItem> orderItemList = orderItemDao.queryByOrderID(orderID);
         return orderItemList;
