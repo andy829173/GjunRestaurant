@@ -21,6 +21,17 @@ public class OrderItemService {
     @Autowired
     ProductDao productDao;
 
+    public List<Order> readOrderList() {
+        List<Order> orderList = orderDao.queryFindAll();
+        return orderList;
+    }
+
+    public List<OrderItem> readOrderItemList(String orderID) {
+        List<OrderItem> orderItemList = orderItemDao.queryByOrderID(orderID);
+        return orderItemList;
+    }
+
+
     public OrderItem createOrderItem(OrderItem orderItem) {
         return orderItemDao.save(orderItem);
     }
@@ -45,16 +56,6 @@ public class OrderItemService {
         newOrder.setTotalPrice(totalPrice);
         orderDao.save(newOrder);
         return newOrder.getID() + "has be created";
-    }
-
-    public List<Order> readOrderList() {
-        List<Order> orderList = orderDao.queryFindAll();
-        return orderList;
-    }
-
-    public List<OrderItem> readOrderItemList(String orderID) {
-        List<OrderItem> orderItemList = orderItemDao.queryByOrderID(orderID);
-        return orderItemList;
     }
 
     public String updateOrderItem(String orderID, List<OrderItem> orderItemList) {
