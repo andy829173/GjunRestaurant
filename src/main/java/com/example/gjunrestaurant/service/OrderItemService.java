@@ -31,11 +31,12 @@ public class OrderItemService {
         return orderItemList;
     }
 
-
+    // 新增訂單明細
     public OrderItem createOrderItem(OrderItem orderItem) {
         return orderItemDao.save(orderItem);
     }
 
+    // 新增整筆訂單
     public String createOrder(List<OrderItem> orderItemList) {
         Order newOrder = new Order();
         Integer totalPrice = 0;
@@ -55,7 +56,7 @@ public class OrderItemService {
         }
         newOrder.setTotalPrice(totalPrice);
         orderDao.save(newOrder);
-        return newOrder.getID() + "has be created";
+        return newOrder.getID() + "has been created";
     }
 
     public String updateOrderItem(String orderID, List<OrderItem> orderItemList) {
@@ -75,36 +76,37 @@ public class OrderItemService {
             } else {
                 // 若 productID 相符則修改數量
                 if (pastProductID == newProductID) {
-                    pastOrderItemList.get(i).setQuantity(orderItemList.get(i).getQuantity());
+                    pastOrderItemList.get(i).setQuantity(quantity);
                     orderItemDao.save(pastOrderItemList.get(i));
-                    msg += "ProductID: " + pastProductID + " has be updated.\n";
+                    msg += "ProductID: " + pastProductID + " has been updated.\n";
                     // 若productID 不相符則新增品項
                 } else {
                     OrderItem newItem = new OrderItem();
                     newItem.setOrderID(orderID);
                     newItem.setProductID(newProductID);
-                    newItem.setQuantity(orderItemList.get(i).getQuantity());
+                    newItem.setQuantity(quantity);
                     OrderItemService orderItemService = new OrderItemService();
                     orderItemService.createOrderItem(newItem);
-                    msg += "ProductID: " + newProductID + " has be created!\n";
+                    msg += "ProductID: " + newProductID + " has been created!\n";
                 }
             }
         }
         return msg;
     }
 
-    // 刪除全部OrderItem(by orderID)
-    public String deleteOrderItemList(String orderID) {
+    // 刪除整筆Order
+    public String deleteOrder(String orderID) {
         List<OrderItem> orderItemList = orderItemDao.queryByOrderID(orderID);
         for (OrderItem orderItem : orderItemList) {
             orderItemDao.delete(orderItem);
         }
-        return "Order Detail has be deleted!!";
+        orderDao.deleteByOrderID(orderID);
+        return "OrderID: " + orderID + " has been deleted!!";
     }
 
-    // 刪除一筆OrderItem
+    // 刪除單筆OrderItem
     public String deleteOrderItem(Integer productID) {
         OrderItem orderItem = orderItemDao.deleteByProductID(productID);
-        return "ProductID: " + productID + " has be deleted!\n";
+        return "ProductID: " + productID + " has been deleted!";
     }
 }
