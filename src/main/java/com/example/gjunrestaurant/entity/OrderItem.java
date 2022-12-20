@@ -16,9 +16,10 @@ import lombok.ToString;
 public class OrderItem {
     @Id
     @Column(name = "id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     Integer ID;
     @Column(name = "orderID")
-    Integer orderID;
+    String orderID;
     @Column(name = "productID")
     Integer productID;
     @Column(name = "quantity")
@@ -26,4 +27,8 @@ public class OrderItem {
     @Column(name = "price")
     Integer price;
 
+    public OrderItem(Integer productID, Integer quantity) {
+        this.productID = productID;
+        this.quantity = quantity;
+    }
 }
