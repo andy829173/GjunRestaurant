@@ -1,7 +1,6 @@
 package com.example.gjunrestaurant.dao;
 
 import com.example.gjunrestaurant.entity.Order;
-import com.example.gjunrestaurant.entity.OrderItem;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
@@ -14,5 +13,8 @@ public interface OrderDao extends CrudRepository<Order, Integer> {
     List<Order> queryFindAll();
 
     @Query(value = "DELETE FROM order WHERE id = ?1", nativeQuery = true)
-    OrderItem deleteByOrderID(String orderID);
+    Order queryDeleteByOrderID(String orderID);
+
+    @Query(value = "SELECT * FROM order WHERE id = ?1", nativeQuery = true)
+    Order queryFindByOrderID(String orderID);
 }
