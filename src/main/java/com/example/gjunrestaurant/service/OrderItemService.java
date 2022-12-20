@@ -1,27 +1,58 @@
 package com.example.gjunrestaurant.service;
 
+import com.example.gjunrestaurant.dao.OrderDao;
 import com.example.gjunrestaurant.dao.OrderItemDao;
+import com.example.gjunrestaurant.dao.ProductDao;
+import com.example.gjunrestaurant.entity.Order;
 import com.example.gjunrestaurant.entity.OrderItem;
+import com.example.gjunrestaurant.entity.Product;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class OrderItemService {
     @Autowired
     OrderItemDao orderItemDao;
+    @Autowired
+    OrderDao orderDao;
+    @Autowired
+    ProductDao productDao;
 
     public OrderItem createOrderItem(OrderItem orderItem) {
         return orderItemDao.save(orderItem);
     }
 
-    public List<OrderItem> readOrderItemList(Integer orderID) {
+    public String createOrder(List<OrderItem> orderItemList) {
+        Order newOrder = new Order();
+        Integer totalPrice = 0;
+        String orderID = newOrder.getID();
+        for (OrderItem orderItem : orderItemList) {
+            Integer productID = orderItem.getProductID();
+            Product product = productDao.findById(productID).get();
+            Integer priceEach = product.getProductPrice();
+            Integer quantity = orderItem.getQuantity();
+            totalPrice += priceEach * quantity;
+
+            orderItem.setOrderID(orderID);
+            orderItem.setProductID(productID);
+            orderItem.setQuantity(quantity);
+            orderItem.setPrice(priceEach);
+            orderItemDao.save(orderItem);
+        }
+        newOrder.setTotalPrice(totalPrice);
+        orderDao.save(newOrder);
+        return newOrder.getID() + "has be created";
+    }
+
+    public List<OrderItem> readOrderItemList(String orderID) {
         List<OrderItem> orderItemList = orderItemDao.queryByOrderID(orderID);
         return orderItemList;
     }
 
-    public String updateOrderItem(Integer orderID, List<OrderItem> orderItemList) {
+    public String updateOrderItem(String orderID, List<OrderItem> orderItemList) {
         List<OrderItem> pastOrderItemList = readOrderItemList(orderID);
         String msg = null;
         for (int i = 0; i <= pastOrderItemList.size(); i++) {
@@ -57,7 +88,7 @@ public class OrderItemService {
     }
 
     // 刪除全部OrderItem(by orderID)
-    public String deleteOrderItemList(Integer orderID) {
+    public String deleteOrderItemList(String orderID) {
         List<OrderItem> orderItemList = orderItemDao.queryByOrderID(orderID);
         for (OrderItem orderItem : orderItemList) {
             orderItemDao.delete(orderItem);
