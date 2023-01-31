@@ -38,8 +38,8 @@ public class OrderService {
     // 新增整筆訂單
     public String createOrder(List<OrderItem> orderItemList) {
         Order newOrder = new Order();
-        Integer totalPrice = 0;
         String orderID = newOrder.getID();
+        Integer totalPrice = 0;
         for (OrderItem orderItem : orderItemList) {
             Integer productID = orderItem.getProductID();
             Product product = productDao.findById(productID).get();
