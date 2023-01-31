@@ -3,6 +3,7 @@ package com.example.gjunrestaurant.service;
 import com.example.gjunrestaurant.dao.ReservationDao;
 import com.example.gjunrestaurant.entity.Reservation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.util.Streamable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -12,25 +13,28 @@ public class ReservationService {
     @Autowired
     ReservationDao reservationDao;
 
-    public Reservation createReservation(Reservation reservation) {
-        return reservationDao.save(reservation);
+    public String createReservation(Reservation reservation) {
+        Reservation newReservation = reservationDao.save(reservation);
+        return "Reservation[" + newReservation.getID() + "] has be reserved";
     }
 
-    public Iterable<Reservation> readAll() {
-        return reservationDao.findAll();
+    public List<Reservation> getReservations() {
+        return Streamable.of(reservationDao.findAll()).toList();
     }
 
-    public Reservation updateReservation(Reservation reservation) {
+    public Reservation getOneReservation(Integer reservationID) {
+        return reservationDao.findById(reservationID).get();
+    }
+
+    public String reviseReservation(Reservation reservation) {
         Integer reservationID = reservation.getID();
-        Reservation dbReservation = reservationDao.findById(reservationID).get();
-
-        dbReservation.setDate(reservation.getDate());
-        dbReservation.setTime(reservation.getTime());
-        dbReservation.setTableFor(reservation.getTableFor());
-        dbReservation.setName(reservation.getName());
-        dbReservation.setPhone(reservation.getPhone());
-        dbReservation.setEmail(reservation.getEmail());
-        
-        return reservationDao.save(dbReservation);
+        reservationDao.save(reservation);
+        return "ReservationID[" + reservationID + "] has be updated.";
     }
+
+    public String deleteReservation(Integer reservationID) {
+        reservationDao.deleteById(reservationID);
+        return "ReservationID[" + reservationID + "] has be deleted";
+    }
+
 }
