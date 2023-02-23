@@ -4,6 +4,9 @@ GjunRestaurant.iml
 HELP.md
 application.properties
 assets/
+log/
+target/classes/banner.txt
+.DS_Store
 # Created by https://www.toptal.com/developers/gitignore/api/java,intellij,git
 # Edit at https://www.toptal.com/developers/gitignore?templates=java,intellij,git
 

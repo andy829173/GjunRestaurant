@@ -1,7 +1,11 @@
 package com.example.gjunrestaurant.service;
 
+import com.example.gjunrestaurant.controller.TestController;
 import com.example.gjunrestaurant.dao.ProductDao;
+import com.example.gjunrestaurant.dto.CreateProductDto;
 import com.example.gjunrestaurant.entity.Product;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.util.Streamable;
 import org.springframework.stereotype.Service;
@@ -10,6 +14,7 @@ import java.util.List;
 
 @Service
 public class ProductService {
+    private static final Logger logger = LoggerFactory.getLogger(TestController.class);
     @Autowired
     ProductDao productDao;
 
@@ -39,5 +44,24 @@ public class ProductService {
 
     public Product getOneProduct(Integer productID) {
         return productDao.findById(productID).get();
+    }
+
+    public boolean createProduct(CreateProductDto requestDto){
+        boolean isSuccess = false;
+        Product newProduct = new Product();
+        newProduct.setNameChi(requestDto.getNameChi());
+        newProduct.setNameEng(requestDto.getNameEng());
+        newProduct.setDescription(requestDto.getDescription());
+        newProduct.setProductPrice(requestDto.getPrice());
+        newProduct.setCategory(requestDto.getCategory());
+        newProduct.setImagePath(requestDto.getBase64Img());
+
+        try {
+            productDao.save(newProduct);
+            isSuccess = true;
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+        return isSuccess;
     }
 }

@@ -1,32 +1,30 @@
 package com.example.gjunrestaurant.entity;
 
-
 import jakarta.persistence.*;
-import lombok.Getter;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.Builder;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
 
 @Entity
 @Table(name = "product")
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
-@ToString
+@AllArgsConstructor
 public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Integer ID;
+    private Integer ID;
     @Column(name = "NameChi")
-    String nameChi;
+    private String nameChi;
     @Column(name = "NameEng")
-    String nameEng;
+    private String nameEng;
     @Column(name = "Description")
-    String description;
+    private String description;
     @Column(name = "Price")
-    Integer productPrice;
-    @Column(name = "ImagePath")
-    String imagePath;
+    private Integer productPrice;
+    @Column(name = "ImagePath", columnDefinition="LONGTEXT")
+    private String imagePath;
     @Column(name = "category")
-    Integer category;
+    private Integer category;
 }
