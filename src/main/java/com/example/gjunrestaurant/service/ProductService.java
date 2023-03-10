@@ -1,26 +1,26 @@
 package com.example.gjunrestaurant.service;
 
-import com.example.gjunrestaurant.controller.TestController;
 import com.example.gjunrestaurant.dao.ProductDao;
-import com.example.gjunrestaurant.dto.CreateProductDto;
+import com.example.gjunrestaurant.dto.product.CreateProductDto;
+import com.example.gjunrestaurant.dto.product.ReviseProductDto;
 import com.example.gjunrestaurant.entity.Product;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.util.Streamable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Slf4j
 @Service
 public class ProductService {
-    private static final Logger logger = LoggerFactory.getLogger(TestController.class);
     @Autowired
     ProductDao productDao;
 
+    // Get product list
     public List<Product> getProducts() {
-        List<Product> productList = Streamable.of(productDao.findAll()).toList();
-        return productList;
+        return Streamable.of(productDao.findAll()).toList();
     }
 
     public List<Integer> addProducts(List<Product> productList) {
@@ -32,8 +32,11 @@ public class ProductService {
         return idList;
     }
 
-    public String reviseProduct(Product product) {
+    public String reviseProduct(ReviseProductDto requestDto) {
+        Product product = new Product();
+        BeanUtils.copyProperties(requestDto, product);
         productDao.save(product);
+        System.out.println(product);
         return "ProductID[" + product.getID() + "] has be revised.";
     }
 
@@ -43,25 +46,15 @@ public class ProductService {
     }
 
     public Product getOneProduct(Integer productID) {
-        return productDao.findById(productID).get();
+        if (productDao.findById(productID).isPresent()) {
+            return productDao.findById(productID).get();
+        }
+        return null;
     }
 
-    public boolean createProduct(CreateProductDto requestDto){
-        boolean isSuccess = false;
-        Product newProduct = new Product();
-        newProduct.setNameChi(requestDto.getNameChi());
-        newProduct.setNameEng(requestDto.getNameEng());
-        newProduct.setDescription(requestDto.getDescription());
-        newProduct.setProductPrice(requestDto.getPrice());
-        newProduct.setCategory(requestDto.getCategory());
-        newProduct.setImagePath(requestDto.getBase64Img());
-
-        try {
-            productDao.save(newProduct);
-            isSuccess = true;
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-        }
-        return isSuccess;
+    public Integer createProduct(CreateProductDto requestDto) throws Exception {
+        Product product = new Product();
+        BeanUtils.copyProperties(requestDto, product);
+        return productDao.save(product).getID();
     }
 }

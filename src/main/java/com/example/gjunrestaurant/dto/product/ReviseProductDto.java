@@ -1,16 +1,16 @@
-package com.example.gjunrestaurant.dto;
-
+package com.example.gjunrestaurant.dto.product;
 
 import lombok.Builder;
 import lombok.Data;
 
 @Data
 @Builder
-public class CreateProductDto {
+public class ReviseProductDto {
+    Integer ID;
     String nameChi;
     String nameEng;
     String description;
-    Integer price;
+    Integer productPrice;
     Integer category;
-    String base64Img;
+    String imagePath;
 }

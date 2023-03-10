@@ -1,18 +1,18 @@
 package com.example.gjunrestaurant.controller;
 
-import com.example.gjunrestaurant.dto.CreateProductDto;
+import com.example.gjunrestaurant.dto.product.CreateProductDto;
+import com.example.gjunrestaurant.dto.product.ReviseProductDto;
 import com.example.gjunrestaurant.entity.Product;
 import com.example.gjunrestaurant.service.ProductService;
-import jakarta.servlet.http.HttpServletResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
+@Slf4j
 @RestController
 public class ProductController {
     @Autowired
@@ -20,21 +20,24 @@ public class ProductController {
 
     @GetMapping("/product")
     public List<Product> getProducts() {
-        List<Product> productList = null;
-        productList = productService.getProducts();
-        return productList;
+        return productService.getProducts();
     }
 
-    // return ProductIDs
-    @PostMapping("/product")
-    public List<Integer> addProducts(List<Product> productList) {
-        List<Integer> idList = productService.addProducts(productList);
-        return idList;
+    @GetMapping("/product/{productID}")
+    public ResponseEntity<Product> getProduct(@PathVariable("productID") Integer productID) {
+        Product product = productService.getOneProduct(productID);
+
+        // need to be fixed
+        if (product != null) {
+            return new ResponseEntity<>(product, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(null, HttpStatus.BAD_GATEWAY);
+        }
     }
 
     @PatchMapping("/product")
-    public String reviceProduct(Product product) {
-        return productService.reviseProduct(product);
+    public String reviseProduct(@RequestBody ReviseProductDto requestDto) {
+        return productService.reviseProduct(requestDto);
     }
 
     @DeleteMapping("/product")
@@ -43,16 +46,16 @@ public class ProductController {
         return productService.deleteProduct(id);
     }
 
-    @PostMapping("/createProduct")
-    public String createProduct(@RequestBody CreateProductDto requestDto, HttpServletResponse response) {
+    @PostMapping("/product")
+    public ResponseEntity<String> createProduct(@RequestBody CreateProductDto requestDto) {
         String msg;
-        boolean isSuccess = productService.createProduct(requestDto);
-        if (isSuccess) {
-            msg = "新增成功";
-            response.setStatus(200);
-        } else {
-            msg = "新增失敗";
+        try {
+            Integer productId = productService.createProduct(requestDto);
+            msg = productId + " has be created.";
+            return new ResponseEntity<>(msg, HttpStatus.OK);
+        } catch (Exception e) {
+            msg = "新增失敗 Exception: " + e.getMessage();
+            return new ResponseEntity<>(msg, HttpStatus.FORBIDDEN);
         }
-        return msg;
     }
 }
