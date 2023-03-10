@@ -2,18 +2,17 @@ package com.example.gjunrestaurant.entity;
 
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
+
+import java.io.Serializable;
 
 @Entity
 @Table(name = "orderItem")
-@Getter
-@Setter
+@Data
+@Builder
 @NoArgsConstructor
-@ToString
-public class OrderItem {
+@AllArgsConstructor
+public class OrderItem implements Serializable {
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)

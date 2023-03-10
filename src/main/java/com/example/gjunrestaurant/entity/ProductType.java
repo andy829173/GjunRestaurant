@@ -4,20 +4,21 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
+
+import java.io.Serializable;
 
 @Entity
 @Table(name = "productType")
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
-@ToString
-public class ProductType {
+public class ProductType implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Integer ID;
+
     @Column(name = "describeChi")
     String describeChi;
+
     @Column(name = "describeEng")
     String describeEng;
 }
