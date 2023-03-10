@@ -3,11 +3,13 @@ package com.example.gjunrestaurant.service;
 import com.example.gjunrestaurant.dao.OrderDao;
 import com.example.gjunrestaurant.dao.OrderItemDao;
 import com.example.gjunrestaurant.dao.ProductDao;
+import com.example.gjunrestaurant.dto.order.OrderDto;
 import com.example.gjunrestaurant.entity.Order;
 import com.example.gjunrestaurant.entity.OrderItem;
 import com.example.gjunrestaurant.entity.Product;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -36,26 +38,32 @@ public class OrderService {
     }
 
     // 新增整筆訂單
-    public String createOrder(List<OrderItem> orderItemList) {
+    @Transactional(rollbackFor = Exception.class) // 若Exception發生，則整筆訂單rollback
+    public String createOrder(List<OrderDto> orderDtoList) {
+        // 先取得新訂單ID (orderID)
         Order newOrder = new Order();
         String orderID = newOrder.getID();
-        Integer totalPrice = 0;
-        for (OrderItem orderItem : orderItemList) {
-            Integer productID = orderItem.getProductID();
+        int totalPrice = 0;
+
+        for (OrderDto orderDto : orderDtoList) {
+            Integer productID = orderDto.getProductID();
+            Integer quantity = orderDto.getQuantity();
             Product product = productDao.findById(productID).get();
             Integer priceEach = product.getProductPrice();
-            Integer quantity = orderItem.getQuantity();
             totalPrice += priceEach * quantity;
+            OrderItem orderItem = OrderItem.builder()
+                    .orderID(orderID)
+                    .productID(productID)
+                    .quantity(quantity)
+                    .price(priceEach)
+                    .build();
 
-            orderItem.setOrderID(orderID);
-            orderItem.setProductID(productID);
-            orderItem.setQuantity(quantity);
-            orderItem.setPrice(priceEach);
             orderItemDao.save(orderItem);
         }
+
         newOrder.setTotalPrice(totalPrice);
         orderDao.save(newOrder);
-        return newOrder.getID() + "has been created";
+        return newOrder.getID() + " has been created";
     }
 
     public String updateOrderItem(String orderID, List<OrderItem> orderItemList) {

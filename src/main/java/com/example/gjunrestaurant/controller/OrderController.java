@@ -1,10 +1,12 @@
 package com.example.gjunrestaurant.controller;
 
+import com.example.gjunrestaurant.dto.order.OrderDto;
 import com.example.gjunrestaurant.entity.Order;
 import com.example.gjunrestaurant.entity.OrderItem;
 import com.example.gjunrestaurant.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.ui.Model;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,8 +18,13 @@ public class OrderController {
     OrderService orderService;
 
     @PostMapping("/order")
-    public String createOrder(@RequestBody List<OrderItem> orderItemList) {
-        return orderService.createOrder(orderItemList);
+    public ResponseEntity<String> createOrder(@RequestBody List<OrderDto> orderDtoList) {
+        try {
+            String msg = orderService.createOrder(orderDtoList);
+            return new ResponseEntity<>(msg, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Something wrong!", HttpStatus.FORBIDDEN);
+        }
     }
 
     @GetMapping("/order")
@@ -44,11 +51,5 @@ public class OrderController {
             msg = "Pay Failed";
         }
         return msg;
-    }
-
-    @GetMapping("/test")
-    public String justTest(Model model) {
-        model.addAttribute("msg", "test");
-        return "orderPage";
     }
 }
